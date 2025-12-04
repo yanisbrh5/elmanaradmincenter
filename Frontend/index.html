@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Manar - Admin Center</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="logo.jpg" alt="El Manar Logo" class="logo-img">
+                <h3>Admin Center</h3>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" onclick="showSection('products', this)">📦 المنتجات</a></li>
+                    <li><a href="#" onclick="showSection('orders', this)">📝 الطلبات</a></li>
+                    <li><a href="#" onclick="showSection('shipping', this)">🚚 الشحن</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <h1>لوحة التحكم</h1>
+            </header>
+
+            <!-- Products Section -->
+            <section id="products-section" class="section">
+                <div class="section-header">
+                    <h2>إدارة المنتجات</h2>
+                    <button class="btn-primary" onclick="openAddProduct()">+ إضافة منتج</button>
+                </div>
+                <div class="table-container">
+                    <table id="products-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>الصورة</th>
+                                <th>الاسم</th>
+                                <th>السعر</th>
+                                <th>القسم</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders-section" class="section" style="display: none;">
+                <div class="section-header">
+                    <h2>الطلبات المستلمة</h2>
+                </div>
+                <div id="orders-container" class="table-container">
+                    <p style="text-align:center; padding:20px;">جاري التحميل...</p>
+                </div>
+            </section>
+
+            <!-- Shipping Section -->
+            <section id="shipping-section" class="section" style="display: none;">
+                <div class="section-header">
+                    <h2>إعدادات الشحن</h2>
+                </div>
+
+                <div class="shipping-grid">
+                    <!-- Column 1: Wilayas -->
+                    <div class="glass-panel">
+                        <div class="panel-header">
+                            <h3>1. الولايات</h3>
+                            <div class="panel-actions">
+                                <button class="btn-icon" onclick="openModal('wilaya-modal')"
+                                    title="إضافة ولاية">+</button>
+                                <button class="btn-icon" onclick="seedWilayas()" title="إضافة الكل">⚡</button>
+                            </div>
+                        </div>
+                        <ul id="wilayas-list" class="list-group"></ul>
+                    </div>
+
+                    <!-- Column 2: Baladiyas -->
+                    <div class="glass-panel" id="baladiya-panel" style="opacity: 0.5; pointer-events: none;">
+                        <div class="panel-header">
+                            <h3>2. البلديات</h3>
+                            <button class="btn-icon" onclick="openModal('baladiya-modal')"
+                                title="إضافة بلدية">+</button>
+                        </div>
+                        <p id="wilaya-hint" class="hint-text"> اختر ولاية لعرض بلدياتها</p>
+                        <ul id="baladiyas-list" class="list-group"></ul>
+                    </div>
+
+                    <!-- Column 3: Rates -->
+                    <div class="glass-panel" id="rates-panel" style="opacity: 0.5; pointer-events: none;">
+                        <div class="panel-header">
+                            <h3>3. أسعار الشحن</h3>
+                        </div>
+                        <p id="baladiya-hint" class="hint-text">اختر بلدية لتحديد السعر</p>
+
+                        <div id="rates-content" style="display: none;">
+                            <div class="rate-card">
+                                <div class="icon">🏠</div>
+                                <label>توصيل للمنزل</label>
+                                <div class="input-group">
+                                    <input type="number" id="shipping-price-home" placeholder="0">
+                                    <span>دج</span>
+                                </div>
+                            </div>
+
+                            <div class="rate-card">
+                                <div class="icon">🏢</div>
+                                <label>توصيل للمكتب</label>
+                                <div class="input-group">
+                                    <input type="number" id="shipping-price-desk" placeholder="0">
+                                    <span>دج</span>
+                                </div>
+                            </div>
+
+                            <button class="btn-primary full-width" onclick="saveShippingRate()">💾 حفظ
+                                التغييرات</button>
+                            <div id="shipping-status-msg" class="status-message"
+                                style="display: none; margin-top: 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('product-modal')">&times;</span>
+            <h2>إضافة منتج جديد</h2>
+            <form id="add-product-form">
+                <div class="form-group">
+                    <label>اسم المنتج</label>
+                    <input type="text" id="p-name" required>
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea id="p-desc" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>السعر (دج)</label>
+                    <input type="number" id="p-price" required>
+                </div>
+                <div class="form-group">
+                    <label>القسم</label>
+                    <select id="p-category" required></select>
+                </div>
+                <div class="form-group">
+                    <label>الألوان المتاحة (مفصولة بفاصلة)</label>
+                    <input type="text" id="p-colors" placeholder="أحمر,أزرق,أخضر">
+                    <small style="color: #888; display: block; margin-top: 5px;">مثال: أحمر,أزرق,أخضر أو
+                        red,blue,green</small>
+                </div>
+                <div class="form-group">
+                    <label>📸 الصور (اختر صورة واحدة أو أكثر)</label>
+                    <input type="file" id="p-image-file" accept="image/*" multiple>
+                    <small style="color: #888; display: block; margin-top: 5px;">
+                     
+                    </small>
+                </div>
+
+                <div id="product-status-msg" class="status-message" style="display: none;"></div>
+
+                <button type="submit" id="btn-save-product" class="btn-primary full-width">💾 حفظ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Wilaya Modal -->
+    <div id="wilaya-modal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close" onclick="closeModal('wilaya-modal')">&times;</span>
+            <h2>إضافة ولاية</h2>
+            <input type="text" id="modal-new-wilaya" placeholder="اسم الولاية">
+            <button class="btn-primary full-width" onclick="addWilayaFromModal()">إضافة</button>
+        </div>
+    </div>
+
+    <!-- Baladiya Modal -->
+    <div id="baladiya-modal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close" onclick="closeModal('baladiya-modal')">&times;</span>
+            <h2>إضافة بلدية</h2>
+            <input type="text" id="modal-new-baladiya" placeholder="اسم البلدية">
+            <button class="btn-primary full-width" onclick="addBaladiyaFromModal()">إضافة</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
